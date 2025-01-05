@@ -14,10 +14,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class articleEntity extends baseEntity {
+public class ArticleEntity extends baseEntity {
 
     private String subject;
     private String content;
-
 
 }
