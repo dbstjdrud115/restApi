@@ -4,6 +4,7 @@ package com.li.restApiStudy.article.service;
 import com.li.restApiStudy.article.dto.ArticleDTO;
 import com.li.restApiStudy.article.entity.ArticleEntity;
 import com.li.restApiStudy.article.repository.ArticleRepository;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,31 @@ public class ArticleService {
         * */
         Optional<ArticleEntity> getOneArticle = articleRepository.findById(id);
         return getOneArticle.map(result->new ArticleDTO(result)).orElse(null);
+    }
+
+    public ArticleEntity write(String content, String subject) {
+        ArticleEntity article = ArticleEntity.builder()
+                .subject(subject)
+                .content(content)
+                .build();
+        articleRepository.save(article);
+        return article;
+    }
+
+    public ArticleEntity update(Long id, @NotBlank String subject, @NotBlank String content) {
+        ArticleEntity article = articleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 데이터가 없습니다. id=" + id));
+        article.setSubject(subject);
+        article.setContent(content);
+        articleRepository.save(article);
+        return article;
+    }
+
+    public ArticleEntity deleteArticle(Long id) {
+
+        ArticleEntity article = articleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 데이터가 없습니다. id=" + id));
+        articleRepository.deleteById(id);
+        return article;
     }
 }

@@ -46,41 +46,43 @@ public class restApiStudyController {
     }
 
     @GetMapping("{id}")
-    public ArticleDTO readOneArticle(@PathVariable Long id) {
+    public ResultData readOneArticle(@PathVariable Long id) {
         ArticleDTO articleDTO = articleService.getOneArticle(id);
-        //ArticleDTO articleDTO = new ArticleDTO(new ArticleEntity("제목", "내용"));
-        return articleDTO;
+        return new ResultData("200", "단건조회성공~", articleDTO);
     }
 
     @PostMapping("")
-    public String createArticle(@Valid @RequestBody ArticleDTO req) {
-        /*PostMan
-            1차 {"subject":"테스트"
-                 ,"content" : "내용"
-                } = 성공
-            2차 {"subject":"테스트"
-                 ,"content" : ""
-                } = Validation failed for argument... 체크 성공
-            3차 {"subject":"     "
-             ,"content" : "공백테스트"
-                } = Validation failed for argument... 체크 성공
-         */
-        System.out.println(req.getSubject());
-        System.out.println(req.getContent());
-        return "생성완료";
+    public ResultData createArticle(@Valid @RequestBody ArticleDTO req) {
+
+        try {
+            ArticleEntity createResult = articleService.write(req.getContent(), req.getSubject());
+            return new ResultData("200", "성공", createResult);
+        } catch (Exception e) {
+            log.error("생성에러 발생: {}", e.getMessage(), e);
+            return new ResultData("400", "실패", null);
+        }
     }
 
     @PutMapping("{id}")
-    public String updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleDTO req) {
-        System.out.println(req.getSubject());
-        System.out.println(req.getContent());
-        return "수정완료";
+    public ResultData<ArticleEntity> updateArticle(@PathVariable("id") Long id, @Valid @RequestBody ArticleDTO req) {
+        try {
+            ArticleEntity articleEntity = articleService.update(id, req.getSubject(), req.getContent());
+            return new ResultData<>("200", "수정완료", articleEntity);
+        } catch (Exception e) {
+            log.error("수정에러 발생: {}", e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     @DeleteMapping("{id}")
-    public String deleteArticle(@PathVariable Long id) {
-        System.out.println(id);
-        return "삭제완료";
+    public ResultData<ArticleEntity> deleteArticle(@PathVariable Long id) {
+        try{
+            ArticleEntity articleEntity = articleService.deleteArticle(id);
+            return new ResultData<>("200", "삭제 성공", articleEntity);
+        }catch (Exception e){
+            log.error("생성에러 발생: {}", e.getMessage(), e);
+            return new ResultData("400", "실패", null);
+        }
     }
 
 
